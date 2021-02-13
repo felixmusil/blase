@@ -15,7 +15,28 @@ For the introduction of ASE , please visit https://wiki.fysik.dtu.dk/ase/index.h
 
 
 
+# Deploying
 
+``` sh
+
+wget https://www.blender.org/download/Blender2.91/blender-2.91.2-linux64.tar.xz/
+
+tar -xf blender-2.91.2-linux64.tar.xz
+
+mv ./blender-2.91.2-linux64/2.91/python ./blender-2.91.2-linux64/2.91/python_bak
+
+conda create -n py37 python=3.7.7 -y
+conda activate py37
+
+pip install ase scikit-image
+
+cd ~/git/test/blase
+export BLASE_PATH=/home/felix/git/test/blase
+export BLENDER_COMMAND="PYTHONHOME=/home/felix/miniconda2/envs/py37 PYTHONPATH=/home/felix/miniconda2/envs/py37/lib/python3.7 /home/felix/source/blender-2.91.2-linux64/blender"
+
+PYTHONHOME=/home/felix/miniconda2/envs/py37 PYTHONPATH=/home/felix/miniconda2/envs/py37/lib/python3.7 /home/felix/source/blender-2.91.2-linux64/blender --python-use-system-env
+
+```
 
 ### Author
 * Xing Wang  <xingwang1991@gmail.com>
@@ -64,14 +85,14 @@ atoms.center(vacuum  = 1.0)
 
 camera_loc = atoms[3].position + [30, 0, 10]
 
-kwargs = {'show_unit_cell': 0, 
+kwargs = {'show_unit_cell': 0,
           'engine': 'CYCLES', #'BLENDER_EEVEE' #'BLENDER_WORKBENCH'
           'camera_loc': camera_loc,  # distance from camera to front atom
           'camera_type': 'PERSP',  #  ['PERSP', 'ORTHO', 'PANO']
           'camera_lens': 100,  #
           'camera_target': atoms[3].position, #
           'ortho_scale': None, #
-          'radii': 0.6, 
+          'radii': 0.6,
           'bonds': 'all',
         'functions': [['add_light', {'loc': [10, 0, 10], 'light_type': 'POINT'}],
                       ['draw_plane', {'size': 100, 'loc': (0, 0, -0.0), 'color': (0, 0, 0, 1.0), 'material_style': 'mirror'}]],
@@ -94,14 +115,14 @@ atoms = read('ATP.pdb')
 atoms.positions[:, 2] -= min(atoms.positions[:, 2]) - 2
 camera_loc = atoms[3].position + [50, 0, 20]
 
-kwargs = {'show_unit_cell': 0, 
+kwargs = {'show_unit_cell': 0,
           'engine': 'CYCLES', #'BLENDER_EEVEE' #'BLENDER_WORKBENCH'
           'camera_loc': camera_loc,  # distance from camera to front atom
           'camera_type': 'PERSP',  #  ['PERSP', 'ORTHO', 'PANO']
           'camera_lens': 100,  #
           'camera_target': atoms[3].position, #
           'ortho_scale': None, #
-          'radii': 0.6, 
+          'radii': 0.6,
           'bonds': 'all',
           'functions': [['draw_plane', {'size': 1000, 'loc': (0, 0, -1.0)}]],
           # 'resolution_x': 2000,
@@ -137,8 +158,8 @@ from ase.io.cube import read_cube_data
 from blase.tools import write_blender
 
 data, atoms = read_cube_data('test.cube')
-kwargs = {'show_unit_cell': 1, 
-          'radii': 0.4, 
+kwargs = {'show_unit_cell': 1,
+          'radii': 0.4,
           'functions': [['draw_isosurface', {'density_grid': data, 'cut_off': -0.002}],
                         ['draw_isosurface', {'density_grid': data, 'cut_off': 0.002, 'color': (0.0, 0.0, 1.0)}]],
           'rotations': [[90, '-x'], [30, 'y']],
@@ -157,7 +178,7 @@ from ase.io import read, write
 from blase.tools import write_blender
 
 atoms = read('tio2.cif')
-kwargs = {'show_unit_cell': 1, 
+kwargs = {'show_unit_cell': 1,
           'engine': 'BLENDER_WORKBENCH',
           'radii': 0.6,
           'bond_cutoff': 1.0,
@@ -176,7 +197,7 @@ write_blender(atoms, **kwargs)
 from ase.io import read, write
 from blase.tools import write_blender, get_polyhedra_kinds, get_bondpairs
 atoms = read('anthraquinone.cif')
-kwargs = {'show_unit_cell': 1, 
+kwargs = {'show_unit_cell': 1,
           'engine': 'BLENDER_WORKBENCH', #'BLENDER_EEVEE' #'BLENDER_WORKBENCH', CYCLES
           'radii': 0.6,
           'bond_cutoff': 1.0,
@@ -196,7 +217,7 @@ from blase.tools import write_blender
 atoms = bulk('Pt', cubic = True)
 atoms = atoms*[6, 6, 6]
 
-kwargs = {'show_unit_cell': 1, 
+kwargs = {'show_unit_cell': 1,
           'engine': 'BLENDER_WORKBENCH', #'BLENDER_EEVEE' #'BLENDER_WORKBENCH', CYCLES
           'radii': 1.0,
           # 'display': True,
@@ -232,7 +253,7 @@ atoms.kinds = kinds
 
 camera_loc = atoms.get_center_of_mass() + [0, -60, 30]
 
-kwargs = {'show_unit_cell': 0, 
+kwargs = {'show_unit_cell': 0,
           'camera_loc': camera_loc,  # distance from camera to front atom
           'camera_type': 'PERSP',  #  ['PERSP', 'ORTHO', 'PANO']
           'camera_lens': 100,  #
@@ -250,7 +271,7 @@ write_blender(atoms, **kwargs)
 
 #### Running on HPC using multi-process
 
-Set up a bash file, and run the python script directly. 
+Set up a bash file, and run the python script directly.
 
 ```bash
 #!/bin/bash -l

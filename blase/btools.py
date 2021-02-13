@@ -42,12 +42,12 @@ def draw_cell(bobj = None, coll = None, cell_vertices = None, celllinewidth = No
         coll_cell.objects.link(obj_cell)
         #
         # edges
-        edges = [[0, 1], [0, 2], [0, 4], 
-                 [1, 3], [1, 5], [2, 3], 
-                 [2, 6], [3, 7], [4, 5], 
+        edges = [[0, 1], [0, 2], [0, 4],
+                 [1, 3], [1, 5], [2, 3],
+                 [2, 6], [3, 7], [4, 5],
                  [4, 6], [5, 7], [6, 7],
         ]
-        cell_edges = {'lengths': [], 
+        cell_edges = {'lengths': [],
                       'centers': [],
                       'normals': []}
         for e in edges:
@@ -64,7 +64,7 @@ def draw_cell(bobj = None, coll = None, cell_vertices = None, celllinewidth = No
         verts, faces = cylinder_mesh_from_instance(cell_edges['centers'], cell_edges['normals'], cell_edges['lengths'], celllinewidth, source)
         # print(verts)
         mesh = bpy.data.meshes.new("mesh_cell")
-        mesh.from_pydata(verts, [], faces)  
+        mesh.from_pydata(verts, [], faces)
         mesh.update()
         for f in mesh.polygons:
             f.use_smooth = True
@@ -74,7 +74,7 @@ def draw_cell(bobj = None, coll = None, cell_vertices = None, celllinewidth = No
         bpy.ops.object.shade_smooth()
         coll_cell.objects.link(obj_edge)
 
-def draw_atoms(bobj = None, coll = None, atom_kinds = None, bsdf_inputs = None, material_style = 'blase', make_real = None):
+def draw_atoms(bobj = None, coll = None, atom_kinds = None, bsdf_inputs = None, material_style = 'plastic', make_real = None):
     '''
     Draw atoms
     bsdf_inputs: dict
@@ -188,7 +188,7 @@ def draw_bonds(bobj = None, coll = None, bond_kinds = None, bond_list= None, bon
         # print(datas['normals'])
         verts, faces = cylinder_mesh_from_instance(datas['centers'], datas['normals'], datas['lengths'], bondlinewidth, source)
         mesh = bpy.data.meshes.new("mesh_kind_{0}".format(kind))
-        mesh.from_pydata(verts, [], faces)  
+        mesh.from_pydata(verts, [], faces)
         mesh.update()
         for f in mesh.polygons:
             f.use_smooth = True
@@ -256,7 +256,7 @@ def draw_bonds_2(bobj = None, coll = None, bond_kinds = None, bond_list= None, b
         # bpy.data.objects['bond_kind_{0}'.format(kind)].select_set(True)
         # STRUCTURE.append(obj_bond)
         bpy.data.collections['instancers'].objects.link(cylinder)
-        coll_bond_kinds.objects.link(obj_bond)        
+        coll_bond_kinds.objects.link(obj_bond)
         print('bonds: {0}   {1:10.2f} s'.format(kind, time.time() - tstart))
 def draw_polyhedras(bobj, coll = None, polyhedra_kinds = None, polyhedra_dict= None, bsdf_inputs = None, material_style = 'plastic'):
     '''
@@ -270,7 +270,7 @@ def draw_polyhedras(bobj, coll = None, polyhedra_kinds = None, polyhedra_dict= N
     if not bsdf_inputs:
         bsdf_inputs = bobj.material_styles_dict[material_style]
     #
-    
+
     # import pprint
     # pprint.pprint(polyhedra_kinds)
     source = bond_source(vertices=4)
@@ -289,8 +289,8 @@ def draw_polyhedras(bobj, coll = None, polyhedra_kinds = None, polyhedra_dict= N
         #
         # create new mesh structure
         mesh = bpy.data.meshes.new("mesh_kind_{0}".format(kind))
-        # mesh.from_pydata(polyhedra_kinds[kind]['vertices'], polyhedra_kinds[kind]['edges'], polyhedra_kinds[kind]['faces'])  
-        mesh.from_pydata(datas['vertices'], [], datas['faces'])  
+        # mesh.from_pydata(polyhedra_kinds[kind]['vertices'], polyhedra_kinds[kind]['edges'], polyhedra_kinds[kind]['faces'])
+        mesh.from_pydata(datas['vertices'], [], datas['faces'])
         mesh.update()
         for f in mesh.polygons:
             f.use_smooth = True
@@ -312,7 +312,7 @@ def draw_polyhedras(bobj, coll = None, polyhedra_kinds = None, polyhedra_dict= N
         verts, faces = cylinder_mesh_from_instance(datas['edge_cylinder']['centers'], datas['edge_cylinder']['normals'], datas['edge_cylinder']['lengths'], 0.01, source)
         # print(verts)
         mesh = bpy.data.meshes.new("mesh_kind_{0}".format(kind))
-        mesh.from_pydata(verts, [], faces)  
+        mesh.from_pydata(verts, [], faces)
         mesh.update()
         for f in mesh.polygons:
             f.use_smooth = True
@@ -328,11 +328,11 @@ def draw_polyhedras(bobj, coll = None, polyhedra_kinds = None, polyhedra_dict= N
 def draw_isosurface(bobj = None, coll = None, volume = None, level = 0.02,
                     closed_edges = False, gradient_direction = 'descent',
                     color=(0.85, 0.80, 0.25) , icolor = None, transmit=0.5,
-                    verbose = False, step_size = 1, 
+                    verbose = False, step_size = 1,
                     bsdf_inputs = None, material_style = 'blase'):
     """Computes an isosurface from a volume grid.
-    
-    Parameters:     
+
+    Parameters:
     """
     from skimage import measure
     colors = [(0.85, 0.80, 0.25), (0.0, 0.0, 1.0)]
@@ -341,14 +341,14 @@ def draw_isosurface(bobj = None, coll = None, volume = None, level = 0.02,
     if not  coll:
         coll = bobj.coll
     coll_isosurface = [c for c in coll.children if 'isosurfaces' in c.name][0]
-    
+
     cell = bobj.cell
     bobj.cell_vertices.shape = (2, 2, 2, 3)
     cell_origin = bobj.cell_vertices[0,0,0]
     #
     spacing = tuple(1.0/np.array(volume.shape))
     scaled_verts, faces, normals, values = measure.marching_cubes_lewiner(volume, level = level,
-                    spacing=spacing,gradient_direction=gradient_direction , 
+                    spacing=spacing,gradient_direction=gradient_direction ,
                     allow_degenerate = False, step_size=step_size)
     #
     scaled_verts = list(scaled_verts)
@@ -378,7 +378,7 @@ def draw_isosurface(bobj = None, coll = None, volume = None, level = 0.02,
     #
     # create new mesh structure
     isosurface = bpy.data.meshes.new("isosurface")
-    isosurface.from_pydata(scaled_verts, [], faces)  
+    isosurface.from_pydata(scaled_verts, [], faces)
     isosurface.update()
     for f in isosurface.polygons:
         f.use_smooth = True
@@ -476,7 +476,7 @@ def cylinder_mesh_from_instance(centers, normals, lengths, scale, source):
         ang = np.arccos(normal[2])
         vec = -1*ang*vec
         r = R.from_rotvec(vec)
-        matrix = r.as_dcm()
+        matrix = r.as_matrix()
         # print(vec, ang)
         vert1 = vert0.copy()
         vert1 = vert1*np.array([scale, scale, length])

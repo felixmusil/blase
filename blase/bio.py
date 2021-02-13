@@ -1,7 +1,7 @@
 # ###################################################################
 """Python module for drawing and rendering ase atoms objects using blender.
 
-Part of code based on ase.io.pov, 
+Part of code based on ase.io.pov,
 https://wiki.fysik.dtu.dk/ase/dev/_modules/ase/io/pov.html
 
 """
@@ -44,11 +44,11 @@ class Blase():
 
     """
     default_settings = {
-        
+
         'display': False,  # display while rendering
         'transparent': True,  # transparent background
-        'resolution_x': None,  # 
-        'resolution_y': None,  # 
+        'resolution_x': None,  #
+        'resolution_y': None,  #
         'camera': True,
         'camera_loc': None,  # x, y is the image plane, z is *out* of the screen
         'camera_type': 'ORTHO',  #  ['PERSP', 'ORTHO']
@@ -60,7 +60,7 @@ class Blase():
         'light': True,
         'light_loc': [0, 0, 200],
         'light_type': 'SUN', # 'POINT', 'SUN', 'SPOT', 'AREA'
-        'point_lights': [],  # 
+        'point_lights': [],  #
         'light_strength': 1.0,
         'background': 'White',  # color
         'textures': None,  # length of atoms list of texture names
@@ -71,11 +71,11 @@ class Blase():
         'bbox': None,
         'bondlinewidth': 0.10,  # radius of the cylinders representing bonds
         'balltypes': None,
-        'radii': None, 
+        'radii': None,
         'colors': None,
         'make_real': False,
         'kind_props': None,
-        'bond_cutoff': None,  # 
+        'bond_cutoff': None,  #
         'bond_list': {},  # [[atom1, atom2], ... ] pairs of bonding atoms
         'polyhedra_dict': {},
         'search_pbc_atoms': False, #{'bonds_dict': {}, 'molecule_list': {}},
@@ -93,9 +93,9 @@ class Blase():
         'gpu': True,
         'num_samples': 128,
         'build_collection': True,
-        }  
+        }
     #
-    
+
 
     def __init__(self, images, outfile = 'bout', name = None, rotations=None, scale=1, debug = False,
                               **parameters):
@@ -175,7 +175,7 @@ class Blase():
         #------------------------------------------------------------
         self.polyhedra_kinds = get_polyhedra_kinds(self.atoms, self.atom_kinds, self.bond_list, polyhedra_dict = self.polyhedra_dict)
         #------------------------------------------------------------
-        # cell 
+        # cell
         # disp = atoms.get_celldisp().flatten()
         if self.show_unit_cell == 'default':
             if self.atoms.pbc.any():
@@ -217,7 +217,7 @@ class Blase():
         self.com = np.mean(self.bbox, axis=1)
         if self.camera_target is None:
             self.camera_target = self.com
-        
+
         if not self.ortho_scale:
             if self.w > self.h:
                 self.ortho_scale = self.w + 1
@@ -361,7 +361,7 @@ class Blase():
         self.look_at(lamp, self.camera_target, roll = radians(0))
         self.STRUCTURE.append(lamp)
 
-    
+
     def highlight_atoms(self, atomlist, shape = 'sphere', radius_scale=1.4,
                            color=(0.0, 1.0, 0.0), transmit=0.6):
         """
@@ -416,7 +416,7 @@ class Blase():
 
 
     def render(self, outfile = None):
-        
+
         # ------------------------------------------------------------------------
         # render settings
         if outfile:
@@ -437,17 +437,23 @@ class Blase():
             self.scene.render.tile_y = 256
             self.scene.cycles.samples = self.num_samples
 
+        self.scene.cycles.samples = self.num_samples
+        self.scene.cycles.use_denoising = True
+        self.scene.cycles.denoiser = 'OPENIMAGEDENOISE'
+        print(list(self.scene.cycles.items()))
         self.scene.render.film_transparent = True
         # self.scene.render.alpha = 'SKY' # in ['TRANSPARENT', 'SKY']
         self.scene.render.resolution_x = self.resolution_x
         self.scene.render.resolution_y = int(self.resolution_x*self.h/self.w)
         print('dimension: ', self.scene.render.resolution_x, self.scene.render.resolution_y)
         self.scene.render.filepath = '{0}'.format(self.outfile)
+        bpy.context.scene.view_layers['View Layer'].cycles.use_denoising = True
         if self.save_to_blend:
             print('saving to {0}.blend'.format(self.outfile))
             bpy.ops.wm.save_as_mainfile('EXEC_SCREEN', filepath = '{0}.blend'.format(self.outfile))
         elif self.run_render:
             bpy.ops.render.render(write_still = 1, animation = self.animation)
+
     def export(self, filename = 'blender-ase.obj'):
         # render settings
         if filename.split('.')[-1] == 'obj':

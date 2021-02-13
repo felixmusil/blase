@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+import sys
+sys.path.insert(0,'/home/felix/git/blase/')
+
 from ase.io import read
 from ase.io.cube import read_cube_data
 from blase.bio import Blase
@@ -24,7 +26,7 @@ def main():
         getattr(bobj, name)(**paras)
     # if bobj.'run_render':
     # bobj.load_frames()
-    
+
     bobj.render()
     # bobj.export('h2o.xyz')
     print('\n Finished!')

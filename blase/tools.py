@@ -56,7 +56,8 @@ def write_blender(atoms, display = False, queue = None, **kwargs):
     elif queue == 'SLURM':
         cmd = 'srun -n $SLURM_NTASKS ' +  blender_cmd + ' -b ' + ' -P ' + blase_cmd
     else:
-        cmd = blender_cmd + ' -b ' + ' -P ' + blase_cmd
+
+        cmd = 'PYTHONPATH=/home/felix/miniconda2/envs/rascal_benchmark/bin/python '+blender_cmd + ' --python-use-system-env ' + ' -b ' + ' -P ' + blase_cmd
     print(cmd)
     errcode = os.system(cmd)
     # if errcode != 0:
@@ -104,6 +105,7 @@ def get_atom_kinds(atoms, props = {}):
                     atom_kinds[kind][prop] = value
     print('get_atom_kinds: {0:10.2f} s'.format(time.time() - tstart))
     return atom_kinds
+
 def get_bond_kinds(atoms, atom_kinds, bondlist):
     '''
     Build faces for instancing bonds.
@@ -111,7 +113,7 @@ def get_bond_kinds(atoms, atom_kinds, bondlist):
     mesh.from_pydata(vertices, [], faces)
     '''
     # view(atoms)
-    
+
     tstart = time.time()
     # bond_kinds = copy.deepcopy(atom_kinds)
     bond_kinds = atom_kinds.copy()

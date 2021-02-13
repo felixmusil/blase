@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Author: 
+Author:
     Xing Wang <xing.wang@psi.ch>
 """
 import numpy as np
@@ -76,8 +76,8 @@ class Boundary:
         r = scipy.spatial.transform.Rotation.from_rotvec(vec)
         if scipy.version.version >= '1.4':
             mat = r.as_matrix()
-        else: 
-            mat = r.as_dcm()
+        else:
+            mat = r.as_matrix()
         # print(mat)
         atoms.positions = atoms.positions.dot(mat)
         # atoms.cell = atoms.cell.dot(mat)
@@ -94,7 +94,7 @@ class Boundary:
         index = index/np.linalg.norm(index)
         points = cell*index
         # print(points)
-        # x 
+        # x
         v1 = points[1] - points[0]
         v2 = points[2] - points[0]
         normal = np.cross(v1, v2)
