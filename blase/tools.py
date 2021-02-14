@@ -9,6 +9,9 @@ from ase.visualize import view
 import pprint
 import time
 import copy
+from distutils.sysconfig import get_python_lib
+import sys
+from subprocess import run
 
 def get_bondpairs(atoms, cutoff=1.0, rmbonds = {}):
     """
@@ -42,30 +45,36 @@ def get_bondpairs(atoms, cutoff=1.0, rmbonds = {}):
     return bondpairs
 
 
-def write_blender(atoms, display = False, queue = None, **kwargs):
-    with open('blase.inp', 'wb') as f:
+def write_blender(atoms, display = False,
+                inputfile = 'blase.inp',
+                queue = None, **kwargs):
+
+
+    with open(inputfile, 'wb') as f:
         pickle.dump([atoms, kwargs], f)
-    #
+
+
+    PYTHONPATH = get_python_lib()
+    PYTHONHOME = sys.prefix
+
     blender_cmd = 'blender'
     if 'BLENDER_COMMAND' in os.environ.keys():
         blender_cmd = os.environ['BLENDER_COMMAND']
     blase_path = os.environ['BLASE_PATH']
     blase_cmd = blase_path + '/bin/run-blase.py'
+
     if display:
-        cmd = blender_cmd + ' -P ' + blase_cmd
-    elif queue == 'SLURM':
-        cmd = 'srun -n $SLURM_NTASKS ' +  blender_cmd + ' -b ' + ' -P ' + blase_cmd
+        blender_cmd += ' --python-use-system-env -P'
     else:
+        blender_cmd += ' --python-use-system-env -b -P'
 
-        cmd = 'PYTHONPATH=/home/felix/miniconda2/envs/rascal_benchmark/bin/python '+blender_cmd + ' --python-use-system-env ' + ' -b ' + ' -P ' + blase_cmd
+    cmd = f'PYTHONPATH={PYTHONPATH} PYTHONHOME={PYTHONHOME} {blender_cmd}  {blase_cmd} -- --inputfile={inputfile}'
+    # cmd = f'PYTHONPATH={PYTHONPATH} PYTHONHOME={PYTHONHOME} {blender_cmd}  {blase_cmd} '
+
     print(cmd)
-    errcode = os.system(cmd)
-    # if errcode != 0:
-    #     raise OSError('Command ' + cmd +
-    #                   ' failed with error code %d' % errcode)
+    # print(run(cmd, capture_output=True))
+    os.system(cmd)
 
-# def get_atom_kinds(atoms, props):
-    # return kinds
 def get_atom_kinds(atoms, props = {}):
     # symbols = atoms.symbols
     # formula = atoms.symbols.formula

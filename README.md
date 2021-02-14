@@ -28,13 +28,14 @@ mv ./blender-2.91.2-linux64/2.91/python ./blender-2.91.2-linux64/2.91/python_bak
 conda create -n py37 python=3.7.7 -y
 conda activate py37
 
-pip install ase scikit-image
+pip install ase spglib
+conda install -c conda-forge scikit-image numpy scipy matplotlib seaborn jupyter ipython scikit-learn tqdm jupyter_contrib_nbextensions -y
 
 cd ~/git/test/blase
 export BLASE_PATH=/home/felix/git/test/blase
-export BLENDER_COMMAND="PYTHONHOME=/home/felix/miniconda2/envs/py37 PYTHONPATH=/home/felix/miniconda2/envs/py37/lib/python3.7 /home/felix/source/blender-2.91.2-linux64/blender"
+export BLENDER_COMMAND="/home/felix/source/blender-2.91.2-linux64/blender"
 
-PYTHONHOME=/home/felix/miniconda2/envs/py37 PYTHONPATH=/home/felix/miniconda2/envs/py37/lib/python3.7 /home/felix/source/blender-2.91.2-linux64/blender --python-use-system-env
+python examples/c2h6so.py
 
 ```
 

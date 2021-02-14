@@ -23,7 +23,7 @@ kwargs = {'show_unit_cell': 0,
           'point_lights': [],  #
           'light_strength': 50,
           'gpu': False,
-          'run_render': True,
+          'run_render': False,
           'display': False,
           'functions': [['draw_plane', {'size': 1000, 'location': (0, 0, -1.0)}]],
           'resolution_x': 1000,
