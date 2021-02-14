@@ -39,6 +39,13 @@ python examples/c2h6so.py
 
 ```
 
+Notebook installation of blender
+
+``` sh
+pip install blender_notebook
+blender_notebook install --blender-exec="/home/felix/source/blender-2.91.2-linux64/blender" --blender-external-python
+```
+
 ### Author
 * Xing Wang  <xingwang1991@gmail.com>
 
