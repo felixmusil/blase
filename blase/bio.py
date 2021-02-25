@@ -64,6 +64,7 @@ class Blase():
         'light_strength': 1.0,
         'background': 'White',  # color
         'textures': None,  # length of atoms list of texture names
+        'material_style':'plastic',
         'engine': 'BLENDER_EEVEE', #'BLENDER_EEVEE' #'BLENDER_WORKBENCH'
         'transmits': None,  # transmittance of the atoms
         'show_unit_cell': 'default',
@@ -91,6 +92,7 @@ class Blase():
         'save_to_blend': False,
         'queue': None,
         'gpu': True,
+        'use_denoising':False,
         'num_samples': 128,
         'build_collection': True,
         }
@@ -286,13 +288,14 @@ class Blase():
             node_tree.nodes["Background"].inputs["Strength"].default_value = 1.0
             node_tree.links.new(rgb_node.outputs["Color"], node_tree.nodes["Background"].inputs["Color"])
         #
-    def draw(self, coll = None):
+    def draw(self, coll = None, bonds=True):
         if not coll:
      	   coll = self.coll
         draw_cell(self, coll = coll)
-        draw_atoms(self, coll = coll)
+        draw_atoms(self, coll = coll, material_style=self.material_style)
         # draw_bonds_2(self, coll = coll)
-        draw_bonds(self, coll = coll)
+        if bonds:
+            draw_bonds(self, coll = coll, material_style=self.material_style)
         draw_polyhedras(self, coll = coll)
         if self.isosurface:
             volume = self.isosurface[0]
@@ -328,16 +331,15 @@ class Blase():
         camera_data.dof.aperture_fstop = self.fstop
         camera_data.type = self.camera_type
         camera = bpy.data.objects.new("Camera", camera_data)
-        if self.camera_type == 'ORTHO' and not self.camera_loc:
-            camera.location = [target[0], target[1], 200]
-        else:
-            camera.location = Vector(self.camera_loc)
+        camera.rotation_mode = 'XYZ'
+
+        camera.location = Vector(self.camera_loc)
         bpy.data.cameras['Camera'].type = self.camera_type
         if self.ortho_scale and self.camera_type == 'ORTHO':
             print('add_camera: ', self.ortho_scale)
             bpy.data.cameras['Camera'].ortho_scale = self.ortho_scale
         bpy.context.collection.objects.link(camera)
-        self.look_at(camera, target, roll = radians(0))
+        self.look_at(camera, target, roll = radians(180))
         self.STRUCTURE.append(camera)
         bpy.context.scene.camera = camera
     def add_light(self, light_type = 'SUN', name = "Light", energy = 5):
@@ -351,7 +353,7 @@ class Blase():
         if light_type:
             self.light_type = light_type
         light_data = bpy.data.lights.new(name=name, type=self.light_type)
-        light_data.energy = energy
+        light_data.energy = self.light_strength
         lamp = bpy.data.objects.new(name, light_data)
         lamp.location = Vector(self.light_loc)
         bpy.context.collection.objects.link(lamp)
@@ -420,7 +422,7 @@ class Blase():
         # ------------------------------------------------------------------------
         # render settings
         if outfile:
-            self.outfile = outfile
+            self.outfile = os.path.abspath(outfile)
         self.directory = os.path.split(self.outfile)[0]
         if self.directory and not os.path.exists(self.directory):
                 os.makedirs(self.directory)  # cp2k expects dirs to exist
@@ -438,16 +440,16 @@ class Blase():
             self.scene.cycles.samples = self.num_samples
 
         self.scene.cycles.samples = self.num_samples
-        self.scene.cycles.use_denoising = True
+        self.scene.cycles.use_denoising = self.use_denoising
         self.scene.cycles.denoiser = 'OPENIMAGEDENOISE'
-        print(list(self.scene.cycles.items()))
+        # print(list(self.scene.cycles.items()))
         self.scene.render.film_transparent = True
         # self.scene.render.alpha = 'SKY' # in ['TRANSPARENT', 'SKY']
         self.scene.render.resolution_x = self.resolution_x
         self.scene.render.resolution_y = int(self.resolution_x*self.h/self.w)
         print('dimension: ', self.scene.render.resolution_x, self.scene.render.resolution_y)
         self.scene.render.filepath = '{0}'.format(self.outfile)
-        bpy.context.scene.view_layers['View Layer'].cycles.use_denoising = True
+        # bpy.context.scene.view_layers['View Layer'].cycles.use_denoising = True
         if self.save_to_blend:
             print('saving to {0}.blend'.format(self.outfile))
             bpy.ops.wm.save_as_mainfile('EXEC_SCREEN', filepath = '{0}.blend'.format(self.outfile))

@@ -3,7 +3,7 @@ import pickle
 import os
 import json
 from ase import Atoms, Atom
-from ase.data import covalent_radii, atomic_numbers, chemical_symbols
+from ase.data import covalent_radii, atomic_numbers, chemical_symbols, vdw_radii
 from ase.data.colors import jmol_colors
 from ase.visualize import view
 import pprint
@@ -95,6 +95,7 @@ def get_atom_kinds(atoms, props = {}):
         inds = [atom.index for atom in atoms if atoms.kinds[atom.index]==kind]
         color = jmol_colors[number]
         radius = covalent_radii[number]
+        # radius = 0.89*vdw_radii[number]
         atom_kinds[kind]['element'] = element
         atom_kinds[kind]['positions'] = atoms[inds].positions
         atom_kinds[kind]['number'] = number
